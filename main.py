@@ -33,7 +33,7 @@ class GenApp(App):
 
     def SUS(self, Population):
         F = sum(ind.rank for ind in Population)
-        # N := liczba osobników do zachowania
+        # N := count of individuals to be preserved
         N = len(Population) / 2 + 1
         # P: = distance between the pointers
         P = F / N
@@ -66,6 +66,7 @@ class GenApp(App):
         end_n = int(end_n)
         eps_gen = float(eps_gen)
 
+        # generating firs population with random chromosomes
         for i in range(individuals):
             chrom = []
             for j in range(0, int(len(genrange) / 2)):
@@ -74,14 +75,17 @@ class GenApp(App):
 
         eps_fen = float(eps_fen)
 
+        # fitness evaluation
         for i in range(0, len(indies)):
             for j in range(len(fargs)):
                 # setattr is used, because we don't know how many function's attributes will be
                 setattr(indies[i], fargs[j], indies[i].genes[j])
             code = '(' + 'lambda ' + cel + ')(' + str((indies[i].genes)).strip('[]') + ')'
             code = code.strip('[]')
+            #because this is desktop app, eval() is fine, but for web must be sanitized
             indies[i].fitness = eval(code)
 
+        # giving individuals their ranks
         for i in range(end_n):
             if maxstate == "down":
                 indies.sort(key=lambda ind: ind.fitness, reverse=True)
@@ -89,6 +93,7 @@ class GenApp(App):
                 indies.sort(key=lambda ind: ind.fitness, reverse=False)
             for j in range(len(indies)):
                 indies[j].rank = len(indies) - j
+            # SUS algorithm selects parents
             parents = self.SUS(indies)
 
             a = 0.25
@@ -98,6 +103,8 @@ class GenApp(App):
             chrom1 = []
             chrom2 = []
             x = int(len(parents) / 2)
+
+            # children are generated
             for l in range(0, x):
                 l2 = l + x
                 k = np.random.randint(0, len(fargs))
@@ -107,7 +114,7 @@ class GenApp(App):
                     chrom1.append(a * parents[l].genes[m] + (1 - a) * parents[l2].genes[m])
                     chrom2.append(a * parents[l].genes[m] + (1 - a) * parents[l2].genes[m])
 
-                # mutacja
+                # mutation with impact decreased with time
                 for t in range(len(chrom1)):
                     r = np.random.rand()
                     if np.random.rand() < 0.5:
@@ -129,6 +136,7 @@ class GenApp(App):
                 code = code.strip('[]')
                 setattr(indies[n], 'fitness', eval(code))
 
+            # checking fenotype ang genotype similarity stop conditions
             meanfen = sum(ind.fitness for ind in indies) / len(indies)
             meangen = []
             for g in range(len(fargs)):
@@ -149,6 +157,7 @@ class GenApp(App):
             indies.sort(key=lambda ind: ind.fitness, reverse=True)
         else:
             indies.sort(key=lambda ind: ind.fitness, reverse=False)
+        # final result with fitness value and arguments
         result = ("[" + str(fargs2) + "]" + "=" + str(indies[0].genes) + "\n" + "fitness = " + str(indies[0].fitness) + "   end: " + cause)
 
         if (plot_def == "down"):
