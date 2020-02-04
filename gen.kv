@@ -1,0 +1,63 @@
+#:kivy 1.10.1
+
+<GenWidget>:
+	BoxLayout:
+		orientation: 'vertical'
+		size: [1600,1200]
+		size_hint: None, None
+		Label:
+			text: 'Obcjective function'
+		TextInput:
+			id: cel
+			text: 'x, y: -x**2*y'
+		ToggleButton:
+			text: 'minimum'
+			group: 'optimum'
+		ToggleButton:
+			id: maximum
+			text: 'maximum'
+			group: 'optimum'
+			state: 'down'
+		Label:
+			text: 'Range of variables'
+		TextInput:
+			id: genrange
+			text: '-1, 1, -1, 1'
+		Label:
+			text: 'Number of individuals'
+		TextInput:
+			id: individuals
+			text: '30'
+		Label:
+			text: 'End of calculations criteria:'
+		Label:
+			text: 'Number of generations'
+		TextInput:
+			id: end_n
+			text: '100'
+		Label:
+			text: 'Similarity of genotype'
+		TextInput:
+			id: eps_gen
+			text: '0.001'
+		Label:
+			text: 'Similarity of fenotype'
+		TextInput:
+			id: eps_fen
+			text: '0.001'
+
+		Label:
+			text: 'Result'
+		Label:
+			id: result
+			text: str(root.result)
+		Label:
+			text: 'Plot function?'
+		CheckBox:
+			id: plot_def
+			state: 'normal'
+
+		Button:
+			text: 'Run'
+			on_press: result.text = app.evolve(cel.text, genrange.text,individuals.text,end_n.text,eps_gen.text,eps_fen.text, maximum.state, plot_def.state)
+
